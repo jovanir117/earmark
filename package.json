@@ -1,5 +1,5 @@
 {
-  "name": "audio-router",
+  "name": "earmark",
   "private": true,
   "type": "module",
   "scripts": { "test": "node --test" }
