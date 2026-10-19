@@ -1,4 +1,4 @@
-// Audio Router · Apps: pick the output device for each Windows app (game -> headphones, Chrome -> speakers).
+// Earmark · Apps: pick the output device for each Windows app (game -> headphones, Chrome -> speakers).
 // Uses the same per-app endpoint policy that Settings > Sound > Volume mixer uses.
 // Build: build.cmd (built-in .NET Framework csc, C# 5, no dependencies).
 using System;
@@ -420,7 +420,7 @@ namespace AudioRouterApps
         {
             using (Graphics g = CreateGraphics()) scale = g.DpiX / 96f;
             AutoScaleMode = AutoScaleMode.None;
-            Text = "Audio Router · Apps";
+            Text = "Earmark · Apps";
             Font = new Font("Segoe UI", 10f);
             BackColor = Bg;
             ForeColor = Fg;
@@ -794,7 +794,7 @@ namespace AudioRouterApps
             bold = new Font(menu.Font, FontStyle.Bold);
 
             notify.Icon = Icons.Glyph(SystemInformation.SmallIconSize.Width, Icons.LightTaskbar());
-            notify.Text = "Audio Router";
+            notify.Text = "Earmark";
             notify.ContextMenuStrip = menu;
             notify.MouseClick += (s, e) => { if (e.Button == MouseButtons.Left) ShowWindow(); };
             notify.Visible = true;
@@ -848,7 +848,7 @@ namespace AudioRouterApps
                     if (!hinted)
                     {
                         hinted = true;
-                        notify.ShowBalloonTip(4000, "Audio Router sigue aquí", "Clic derecho en el ícono junto al reloj para cambiar salidas.", ToolTipIcon.Info);
+                        notify.ShowBalloonTip(4000, "Earmark sigue aquí", "Clic derecho en el ícono junto al reloj para cambiar salidas.", ToolTipIcon.Info);
                     }
                     TrimSoon(); // after the form is fully disposed
                 };
@@ -926,7 +926,7 @@ namespace AudioRouterApps
             auto.Click += (s, e) =>
             {
                 try { Autostart = !Autostart; }
-                catch (Exception ex) { notify.ShowBalloonTip(4000, "Audio Router", "No se pudo cambiar el inicio: " + ex.Message, ToolTipIcon.Error); }
+                catch (Exception ex) { notify.ShowBalloonTip(4000, "Earmark", "No se pudo cambiar el inicio: " + ex.Message, ToolTipIcon.Error); }
             };
             var reset = new ToolStripMenuItem("Restablecer todo") { Enabled = policy != null };
             reset.Click += (s, e) =>
@@ -934,7 +934,7 @@ namespace AudioRouterApps
                 if (MessageBox.Show("¿Regresar todas las apps a la salida predeterminada?", "Restablecer todo",
                         MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
                 try { policy.ClearAll(); SetTooltip(0); }
-                catch (Exception ex) { notify.ShowBalloonTip(4000, "Audio Router", "No se pudo restablecer: " + ex.Message, ToolTipIcon.Error); }
+                catch (Exception ex) { notify.ShowBalloonTip(4000, "Earmark", "No se pudo restablecer: " + ex.Message, ToolTipIcon.Error); }
             };
             var quit = new ToolStripMenuItem("Salir");
             quit.Click += (s, e) => Quit();
@@ -943,8 +943,8 @@ namespace AudioRouterApps
 
         void SetTooltip(int routed)
         {
-            string t = routed == 0 ? "Audio Router · todo en predeterminado"
-                     : "Audio Router · " + routed + (routed == 1 ? " app con salida propia" : " apps con salida propia");
+            string t = routed == 0 ? "Earmark · todo en predeterminado"
+                     : "Earmark · " + routed + (routed == 1 ? " app con salida propia" : " apps con salida propia");
             notify.Text = t.Length > 63 ? t.Substring(0, 63) : t; // NotifyIcon throws past 63 chars
         }
 
@@ -953,7 +953,7 @@ namespace AudioRouterApps
             try { policy.Set(app.Pid, deviceId); }
             catch (Exception ex)
             {
-                notify.ShowBalloonTip(4000, "Audio Router", "No se pudo cambiar " + app.Name + ": " + ex.Message + ". ¿Se cerró la app?", ToolTipIcon.Error);
+                notify.ShowBalloonTip(4000, "Earmark", "No se pudo cambiar " + app.Name + ": " + ex.Message + ". ¿Se cerró la app?", ToolTipIcon.Error);
             }
         }
 

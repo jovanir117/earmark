@@ -24,7 +24,7 @@ async function ensureOffscreen() {
 function badge(tabId, r) {
   const lost = r?.outputs.some(o => o.fallback);
   chrome.action.setBadgeText({ tabId, text: r ? (lost ? '!' : '♪') : '' }).catch(() => {});
-  chrome.action.setTitle({ tabId, title: r ? `Audio Router: ${r.outputs.map(o => o.label).join(' + ')}` : 'Audio Router' }).catch(() => {});
+  chrome.action.setTitle({ tabId, title: r ? `Earmark: ${r.outputs.map(o => o.label).join(' + ')}` : 'Earmark' }).catch(() => {});
   if (r) chrome.action.setBadgeBackgroundColor({ tabId, color: lost ? '#d97706' : '#2563eb' }).catch(() => {});
 }
 
@@ -38,7 +38,7 @@ async function paint(routes) {
 function flashError(tabId, title) {
   chrome.action.setBadgeBackgroundColor({ tabId, color: '#dc2626' }).catch(() => {});
   chrome.action.setBadgeText({ tabId, text: '×' }).catch(() => {});
-  chrome.action.setTitle({ tabId, title: `Audio Router: ${title}` }).catch(() => {});
+  chrome.action.setTitle({ tabId, title: `Earmark: ${title}` }).catch(() => {});
   setTimeout(async () => {
     const { routes = [] } = await chrome.storage.session.get('routes');
     badge(tabId, routes.find(r => r.tabId === tabId) || null);
