@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Audio Router",
+  "version": "1.2.1",
+  "description": "Manda el audio de cada pestaña a un dispositivo de salida distinto.",
+  "minimum_chrome_version": "116",
+  "permissions": ["tabCapture", "offscreen", "activeTab", "storage"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": { "default_popup": "popup.html", "default_title": "Audio Router" },
+  "commands": {
+    "next-output": {
+      "suggested_key": { "default": "Alt+Shift+A" },
+      "description": "Cambiar la pestaña actual a la siguiente salida de audio"
+    }
+  }
+}
