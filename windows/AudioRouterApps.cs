@@ -20,6 +20,21 @@ namespace AudioRouterApps
     enum EDataFlow { eRender = 0, eCapture = 1, eAll = 2 }
     enum ERole { eConsole = 0, eMultimedia = 1, eCommunications = 2 }
 
+    // Undocumented but stable since Vista: what the Sound control panel uses to set the default output.
+    // Only SetDefaultEndpoint is called; the earlier slots just keep the vtable order.
+    [ComImport, Guid("f8679f50-850a-41cf-9c72-430f290290c8"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface IPolicyConfig
+    {
+        [PreserveSig] int GetMixFormat(); [PreserveSig] int GetDeviceFormat(); [PreserveSig] int ResetDeviceFormat();
+        [PreserveSig] int SetDeviceFormat(); [PreserveSig] int GetProcessingPeriod(); [PreserveSig] int SetProcessingPeriod();
+        [PreserveSig] int GetShareMode(); [PreserveSig] int SetShareMode(); [PreserveSig] int GetPropertyValue();
+        [PreserveSig] int SetPropertyValue();
+        [PreserveSig] int SetDefaultEndpoint([MarshalAs(UnmanagedType.LPWStr)] string deviceId, ERole role);
+    }
+
+    [ComImport, Guid("870af99c-171d-4f9e-af0d-e63df40c2bc9")]
+    class PolicyConfigClient { }
+
     [ComImport, Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")]
     class MMDeviceEnumeratorCo { }
 
@@ -960,6 +975,8 @@ namespace AudioRouterApps
         {
             if (args.Contains("--selftest")) return SelfTest();
             if (args.Contains("--dump")) return Dump();
+            int di = Array.IndexOf(args, "--default");
+            if (di >= 0) return SetDefault(di + 1 < args.Length ? args[di + 1] : "");
             bool tray = args.Contains("--tray"); // autostart: icon only, no window
             bool first;
             using (var single = new Mutex(true, @"Local\AudioRouterApps", out first))
@@ -976,6 +993,25 @@ namespace AudioRouterApps
                 Application.Run(new TrayApp(!tray, show));
                 GC.KeepAlive(single);
             }
+            return 0;
+        }
+
+        // --default "texto": the first output whose name contains it becomes Windows' default for
+        // every role (scenes in Game-buttons call this). Exit 0 = done, 2 = no such output, 1 = Windows refused.
+        static int SetDefault(string part)
+        {
+            string ignored;
+            Device d = part.Length == 0 ? null
+                : Audio.Outputs(out ignored).FirstOrDefault(x => x.Name.IndexOf(part, StringComparison.OrdinalIgnoreCase) >= 0);
+            if (d == null) { Console.WriteLine("no output matches: " + part); return 2; }
+            var pc = (IPolicyConfig)new PolicyConfigClient();
+            try
+            {
+                foreach (ERole role in new[] { ERole.eConsole, ERole.eMultimedia, ERole.eCommunications })
+                    if (pc.SetDefaultEndpoint(d.Id, role) < 0) return 1;
+            }
+            finally { Marshal.ReleaseComObject(pc); }
+            Console.WriteLine("default: " + d.Name);
             return 0;
         }
 
